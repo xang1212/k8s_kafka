@@ -1,0 +1,77 @@
+version: '3.3'
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_DB: 'db'
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_ROOT_PASSWORD: 'password'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./test_db-master:/home/sample
+#  testapp:
+#    image: adventure:2.3
+#    environment:
+#      SPRING_CONFIG: '/home/config/application.yaml'
+#    ports:
+#      - '8888:8080'
+#    volumes:
+#      - /Users/xang/keepappyaml/devconfig.yaml:/home/config/application.yaml
+#  consumeapp:
+#    image: consumerapp:1.5
+#    environment:
+#      SPRING_CONFIG: '/home/config/application.yaml'
+#    ports:
+#      - '8881:8081'
+#    volumes:
+#      - /Users/xang/keepappyaml/application.yaml:/home/config/application.yaml
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - '2181:2181'
+  kafka:
+      image: confluentinc/cp-kafka:latest
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://192.168.65.254:29092,PLAINTEXT_X://localhost:39092
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_X:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      ports:
+        - '29092:29092'
+        - '39092:39092'
+#  kafka2:
+#    image: confluentinc/cp-kafka:latest
+#    depends_on:
+#      - zookeeper
+#    environment:
+#      KAFKA_BROKER_ID: 2
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:9092,PLAINTEXT_Y://192.168.65.254:49092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_Y:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+#    ports:
+#      - '49092:49092'
+#  kafka3:
+#    image: confluentinc/cp-kafka:latest
+#    depends_on:
+#      - zookeeper
+#    environment:
+#      KAFKA_BROKER_ID: 3
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:9092,PLAINTEXT_Y://192.168.65.254:59092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_Y:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+#    ports:
+#      - '59092:59092'
